@@ -425,9 +425,10 @@ def aiter(obj, sentinel=_NOT_PROVIDED):
     if sentinel is _NOT_PROVIDED:
         if not isinstance(obj, AsyncIterable):
             raise TypeError(f'aiter expected an AsyncIterable, got {type(obj)}')
-        if isinstance(obj, AsyncIterator):
-            return obj
-        return (i async for i in obj)
+        ait = obj.__aiter__()
+        if not hasattr(ait, '__anext__'):
+            raise TypeError(f'aiter() returned non-AsyncIterator of type {type(ait)!r}')
+        return ait
 
     if not callable(obj):
         raise TypeError(f'aiter expected an async callable, got {type(obj)}')
